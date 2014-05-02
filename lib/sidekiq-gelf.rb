@@ -2,7 +2,7 @@ require 'logger'
 require 'gelf'
 require 'sidekiq'
 
-require 'sidekiq-gelf/formatter'
+require 'sidekiq-gelf/middleware'
 
 module Sidekiq
   module Logging
