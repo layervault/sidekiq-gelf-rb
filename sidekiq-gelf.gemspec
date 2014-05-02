@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name = "sidekiq-gelf"
-  s.version = "0.0.2"
+  s.version = "1.0.0"
 
   s.author = "Ryan LeFevre"
   s.date = "2014-04-21"
