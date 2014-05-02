@@ -16,7 +16,7 @@ module Sidekiq
                 context: context,
                 worker: worker.class.to_s,
                 queue: queue,
-                params: item
+                params: item['args']
               })
 
               start = Time.now
@@ -30,7 +30,7 @@ module Sidekiq
                 context: context,
                 worker: worker.class.to_s,
                 queue: queue,
-                params: item,
+                params: item['args'],
                 runtime: elapsed(start)
               })
             rescue Exception => e
@@ -41,7 +41,7 @@ module Sidekiq
                 context: context,
                 worker: worker.class.to_s,
                 queue: queue,
-                params: item,
+                params: item['args'],
                 runtime: elapsed(start),
                 exception_class: e.class.to_s,
                 exception_message: e.message,
