@@ -64,7 +64,7 @@ module Sidekiq
         end
 
         def tid
-          Thread.current.object_id.to_s(36),
+          Thread.current.object_id.to_s(36)
         end
 
         def context
