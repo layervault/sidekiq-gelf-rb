@@ -10,8 +10,11 @@ module Sidekiq
       extend self
 
       def hook!(*args)
-        Sidekiq::Logging.logger = ::GELF::Logger.new(*args)
-        Sidekiq::Logging.logger.formatter = Formatter.new
+        Sidekiq.configure_server do |config|
+          config.server_middleware do |chain|
+            chain.add Middleware::Server::GELFLogging, *args
+          end
+        end
       end
     end
   end
