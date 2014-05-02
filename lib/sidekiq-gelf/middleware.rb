@@ -11,6 +11,7 @@ module Sidekiq
             begin
               logger.info({
                 short_message: "Start: #{worker.class.to_s} JID-#{item['jid']}",
+                jid: item['jid'],
                 pid: pid,
                 tid: tid,
                 context: context,
@@ -25,6 +26,7 @@ module Sidekiq
 
               logger.info({
                 short_message: "Done: #{worker.class.to_s} JID-#{item['jid']}",
+                jid: item['jid'],
                 pid: pid,
                 tid: tid,
                 context: context,
@@ -36,6 +38,7 @@ module Sidekiq
             rescue Exception => e
               logger.error({
                 short_message: "Fail: #{worker.class.to_s} JID-#{item['jid']}",
+                jid: item['jid'],
                 pid: pid,
                 tid: tid,
                 context: context,
