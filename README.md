@@ -4,6 +4,8 @@ Enables Sidekiq logging to a GELF-supported server, such as Graylog2.
 
 ## Usage
 
+This will inject the logger as middleware into the Sidekiq server. Add it inside of your `Sidekiq.configure_server` block.
+
 ``` ruby
 # Adds the GELF logger as middleware in Sidekiq in order
 # to include important logging information.
