@@ -17,7 +17,8 @@ module Sidekiq
                 context: context,
                 worker: worker.class.to_s,
                 queue: queue,
-                params: item['args']
+                params: item['args'],
+                latency: Sidekiq::Job.new(item).latency
               })
 
               start = Time.now
