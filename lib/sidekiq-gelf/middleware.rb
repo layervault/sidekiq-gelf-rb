@@ -18,7 +18,7 @@ module Sidekiq
                 worker: worker.class.to_s,
                 queue: queue,
                 params: item['args'],
-                latency: Sidekiq::Job.new(item).latency
+                latency: Sidekiq::Job.new(Sidekiq.dump_json(item)).latency
               })
 
               start = Time.now
