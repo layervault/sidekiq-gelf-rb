@@ -64,15 +64,15 @@ module Sidekiq
         private
 
         def pid
-          Process.pid
+          ::Process.pid
         end
 
         def tid
-          Thread.current.object_id.to_s(36)
+          ::Thread.current.object_id.to_s(36)
         end
 
         def context
-          Thread.current[:sidekiq_context]
+          ::Thread.current[:sidekiq_context]
         end
 
         def elapsed(start)
