@@ -18,7 +18,8 @@ module Sidekiq
                 worker: worker.class.to_s,
                 queue: queue,
                 params: item['args'],
-                latency: Sidekiq::Job.new(Sidekiq.dump_json(item)).latency
+                latency: Sidekiq::Job.new(Sidekiq.dump_json(item)).latency,
+                memory: memory
               })
 
               start = Time.now
@@ -34,7 +35,8 @@ module Sidekiq
                 worker: worker.class.to_s,
                 queue: queue,
                 params: item['args'],
-                runtime: elapsed(start)
+                runtime: elapsed(start),
+                memory: memory
               })
             rescue Exception => e
               logger.error({
@@ -49,7 +51,8 @@ module Sidekiq
                 runtime: elapsed(start),
                 exception_class: e.class.to_s,
                 exception_message: e.message,
-                backtrace: e.backtrace.join("\n")
+                backtrace: e.backtrace.join("\n"),
+                memory: memory
               })
 
               raise e
@@ -73,6 +76,10 @@ module Sidekiq
 
         def context
           ::Thread.current[:sidekiq_context]
+        end
+
+        def memory
+          `ps -o rss= -p #{::Process.pid}`.chomp.to_i
         end
 
         def elapsed(start)
