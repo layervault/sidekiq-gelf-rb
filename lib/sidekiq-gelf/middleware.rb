@@ -83,6 +83,7 @@ module Sidekiq
         end
 
         def elapsed(start)
+          return nil if start.nil?
           (Time.now - start).to_f.round(3)
         end
       end
