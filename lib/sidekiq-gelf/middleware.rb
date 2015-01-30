@@ -9,7 +9,7 @@ module Sidekiq
         def call(worker, item, queue)
           Sidekiq::Logging.with_context("#{worker.class.to_s} JID-#{item['jid']}") do
             begin
-              logger.info({
+              logger.info(filter_fields({
                 short_message: "Start: #{worker.class.to_s} JID-#{item['jid']}",
                 jid: item['jid'],
                 pid: pid,
@@ -20,13 +20,13 @@ module Sidekiq
                 params: item['args'],
                 latency: Sidekiq::Job.new(Sidekiq.dump_json(item)).latency,
                 memory: memory
-              })
+              }))
 
               start = Time.now
 
               yield # Pass the torch
 
-              logger.info({
+              logger.info(filter_fields({
                 short_message: "Done: #{worker.class.to_s} JID-#{item['jid']}",
                 jid: item['jid'],
                 pid: pid,
@@ -37,9 +37,9 @@ module Sidekiq
                 params: item['args'],
                 runtime: elapsed(start),
                 memory: memory
-              })
+              }))
             rescue Exception => e
-              logger.error({
+              logger.error(filter_fields({
                 short_message: "Fail: #{worker.class.to_s} JID-#{item['jid']}",
                 jid: item['jid'],
                 pid: pid,
@@ -53,7 +53,7 @@ module Sidekiq
                 exception_message: e.message,
                 backtrace: e.backtrace.join("\n"),
                 memory: memory
-              })
+              }))
 
               raise e
             end
@@ -85,6 +85,16 @@ module Sidekiq
         def elapsed(start)
           return nil if start.nil?
           (Time.now - start).to_f.round(3)
+        end
+
+        def filter_fields(data)
+          data.each do |key, val|
+            if val.is_a?(String) && val.length > 32766 # max message length
+              data[key] = "[omitted; length = #{val.length}, max = 32766]"
+            end
+          end
+
+          data
         end
       end
     end
