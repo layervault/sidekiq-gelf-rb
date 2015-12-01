@@ -2,12 +2,12 @@
 
 Gem::Specification.new do |s|
   s.name = "sidekiq-gelf"
-  s.version = "1.1.0"
+  s.version = "1.2.0"
 
   s.author = "Ryan LeFevre"
   s.date = "2014-04-21"
   s.description = "GELF logging for Sidekiq"
-  s.email = "ryan@layervault.com"
+  s.email = "meltingice8917@gmail.com"
   s.extra_rdoc_files = [
     "LICENSE",
     "README.md"
