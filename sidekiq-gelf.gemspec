@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.license = 'MIT'
 
   s.add_dependency "gelf", '>= 1.4'
-  s.add_dependency "sidekiq", '~> 3'
+  s.add_dependency "sidekiq", '> 3'
 
   s.add_development_dependency 'rake'
 end
