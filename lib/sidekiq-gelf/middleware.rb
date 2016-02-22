@@ -61,7 +61,7 @@ module Sidekiq
         end
 
         def logger
-          @logger ||= ::GELF::Logger.new(*@args)
+          Thread.current[:sidekiq_gelf_logger] ||= ::GELF::Logger.new(*@args)
         end
 
         private
