@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name = "sidekiq-gelf"
-  s.version = "1.3.0"
+  s.version = "1.3.1"
 
   s.author = "Ryan LeFevre"
   s.description = "GELF logging for Sidekiq"
@@ -18,8 +18,7 @@ Gem::Specification.new do |s|
   s.license = 'MIT'
 
   s.add_dependency "gelf", '>= 1.4'
-  s.add_dependency "sidekiq", '> 3'
+  s.add_dependency "sidekiq", '>= 6.3'
 
   s.add_development_dependency 'rake'
 end
-

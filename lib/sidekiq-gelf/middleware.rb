@@ -7,56 +7,48 @@ module Sidekiq
         end
 
         def call(worker, item, queue)
-          Sidekiq::Logging.with_context("#{worker.class.to_s} JID-#{item['jid']}") do
-            begin
-              logger.info(filter_fields({
-                short_message: "Start: #{worker.class.to_s} JID-#{item['jid']}",
-                jid: item['jid'],
-                pid: pid,
-                tid: tid,
-                context: context,
-                worker: worker.class.to_s,
-                queue: queue,
-                params: item['args'],
-                latency: Sidekiq::Job.new(Sidekiq.dump_json(item)).latency,
-                memory: memory
-              }))
+          Sidekiq::Context.with(worker: worker, item: item, queue: queue) do
+            logger.info(filter_fields(short_message: "Sidekiq start: #{worker.class.to_s} JID-#{item['jid']}",
+                                      jid: item['jid'],
+                                      pid: pid,
+                                      tid: tid,
+                                      context: context,
+                                      worker: worker.class.to_s,
+                                      queue: queue,
+                                      params: item['args'],
+                                      latency: Sidekiq::Queue.new(queue).latency,
+                                      memory: memory))
 
-              start = Time.now
+            start = Time.current
 
-              yield # Pass the torch
+            yield # Pass the torch
 
-              logger.info(filter_fields({
-                short_message: "Done: #{worker.class.to_s} JID-#{item['jid']}",
-                jid: item['jid'],
-                pid: pid,
-                tid: tid,
-                context: context,
-                worker: worker.class.to_s,
-                queue: queue,
-                params: item['args'],
-                runtime: elapsed(start),
-                memory: memory
-              }))
-            rescue Exception => e
-              logger.error(filter_fields({
-                short_message: "Fail: #{worker.class.to_s} JID-#{item['jid']}",
-                jid: item['jid'],
-                pid: pid,
-                tid: tid,
-                context: context,
-                worker: worker.class.to_s,
-                queue: queue,
-                params: item['args'],
-                runtime: elapsed(start),
-                exception_class: e.class.to_s,
-                exception_message: e.message,
-                backtrace: e.backtrace.join("\n"),
-                memory: memory
-              }))
+            logger.info(filter_fields(short_message: "Sidekiq done: #{worker.class.to_s} JID-#{item['jid']}",
+                                      jid: item['jid'],
+                                      pid: pid,
+                                      tid: tid,
+                                      context: context,
+                                      worker: worker.class.to_s,
+                                      queue: queue,
+                                      params: item['args'],
+                                      runtime: elapsed(start),
+                                      memory: memory))
+          rescue StandardError => e
+            logger.error(filter_fields(short_message: "Sidekiq fail: #{worker.class.to_s} JID-#{item['jid']}",
+                                       jid: item['jid'],
+                                       pid: pid,
+                                       tid: tid,
+                                       context: context,
+                                       worker: worker.class.to_s,
+                                       queue: queue,
+                                       params: item['args'],
+                                       runtime: elapsed(start),
+                                       exception_class: e.class.to_s,
+                                       exception_message: e.message,
+                                       backtrace: e.backtrace.join("\n"),
+                                       memory: memory))
 
-              raise e
-            end
+            raise e
           end
         end
 
@@ -84,14 +76,15 @@ module Sidekiq
 
         def elapsed(start)
           return nil if start.nil?
-          (Time.now - start).to_f.round(3)
+
+          (Time.current - start).to_f.round(3)
         end
 
         def filter_fields(data)
           data.each do |key, val|
-            if val.is_a?(String) && val.length > 32766 # max message length
-              data[key] = "[omitted; length = #{val.length}, max = 32766]"
-            end
+            next unless val.is_a?(String) && val.length > 32_766
+
+            data[key] = "[omitted; length = #{val.length}, max = 32766]"
           end
 
           data
